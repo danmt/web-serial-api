@@ -1,6 +1,6 @@
 const { interval, Subject, from } = rxjs;
 const { map, takeUntil, concatMap } = rxjs.operators;
-const decoder = new TextDecoderStream("utf-8");
+const decoder = new TextDecoder("utf-8");
 
 class LineBreakTransformer {
   constructor() {
@@ -10,7 +10,7 @@ class LineBreakTransformer {
 
   transform(chunk, controller) {
     // Append new chunks to existing chunks.
-    this.chunks += chunk;
+    this.chunks += decoder.decode(chunk);
     // For each line breaks in chunks, send the parsed lines out.
     const lines = this.chunks.split("\r\n");
     this.chunks = lines.pop();
@@ -35,17 +35,10 @@ const connect = async () => {
   return port;
 };
 
-const getPortStreamReader = (port) => {
-  const decoder = new TextDecoderStream();
-  const readStreamClosed = port.readable.pipeTo(decoder.writable);
-  const reader = decoder.readable
+const getReader = (port) => {
+  return port.readable
     .pipeThrough(new TransformStream(new LineBreakTransformer()))
     .getReader();
-
-  return {
-    readStreamClosed,
-    reader,
-  };
 };
 
 const monitor = (reader) => {
@@ -57,6 +50,7 @@ const monitor = (reader) => {
           if (done) {
             destroy.next();
             destroy.complete();
+            reader.releaseLock();
             return null;
           }
 
@@ -68,8 +62,7 @@ const monitor = (reader) => {
   );
 };
 
-const disconnect = async (port, reader, readStreamClosed) => {
+const disconnect = async (port, reader) => {
   reader.cancel();
-  await readStreamClosed.catch(() => {});
   await port.close();
 };

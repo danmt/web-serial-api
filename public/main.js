@@ -3,13 +3,13 @@ const disconnectButton = document.getElementById("disconnect-action");
 const portLogsElement = document.getElementById("port-logs");
 
 const init = async () => {
-  let port, reader, readStreamClosed;
+  let port, reader;
 
   connectButton.addEventListener("click", async () => {
     port = await connect();
-    const streamReader = getPortStreamReader(port);
-    reader = streamReader.reader;
-    readStreamClosed = streamReader.readStreamClosed;
+
+    reader = getReader(port);
+    writer = getWriter(port);
 
     monitor(reader).subscribe({
       next: (message) => {
@@ -19,13 +19,12 @@ const init = async () => {
       },
       complete: () => {
         console.log("[readLoop] DONE");
-        reader.releaseLock();
       },
     });
   });
 
   disconnectButton.addEventListener("click", async () => {
-    await disconnect(port, reader, readStreamClosed);
+    await disconnect(port, reader);
     portLogsElement.innerHTML = "";
   });
 };
