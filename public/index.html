@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Serial API</title>
+  </head>
+  <body>
+    <header><h1>Web Serial API</h1></header>
+
+    <main>
+      <section>
+        <h2>Serial Monitor</h2>
+        <button id="connect-action">Connect</button>
+        <button id="disconnect-action">Disconnect</button>
+
+        <div
+          id="port-logs"
+          style="
+            width: 250px;
+            height: 400px;
+            margin: 0.5rem;
+            border: 1px solid black;
+            overflow-y: scroll;
+          "
+        ></div>
+      </section>
+    </main>
+  </body>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.2/rxjs.umd.js"></script>
+  <script src="main.js"></script>
+  <script src="connection.js"></script>
+</html>
