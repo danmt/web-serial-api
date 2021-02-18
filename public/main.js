@@ -3,12 +3,14 @@ const disconnectButton = document.getElementById("disconnect-action");
 const portLogsElement = document.getElementById("port-logs");
 
 const init = async () => {
-  let port, reader;
+  let port, reader, readableStreamClosed;
 
   connectButton.addEventListener("click", async () => {
     port = await connect();
 
-    reader = getReader(port);
+    const readerStream = getReaderStream(port);
+    reader = readerStream.reader;
+    readableStreamClosed = readerStream.readableStreamClosed;
 
     monitor(reader).subscribe({
       next: (message) => {
@@ -23,7 +25,7 @@ const init = async () => {
   });
 
   disconnectButton.addEventListener("click", async () => {
-    await disconnect(port, reader);
+    await disconnect(port, reader, readableStreamClosed);
     portLogsElement.innerHTML = "";
   });
 };
