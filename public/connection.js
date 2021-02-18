@@ -47,6 +47,17 @@ const getReaderStream = (port) => {
   };
 };
 
+const getWriterStream = (port) => {
+  const textEncoder = new TextEncoderStream();
+  const writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+  const writer = textEncoder.writable.getWriter();
+
+  return {
+    writer,
+    writableStreamClosed,
+  };
+};
+
 const monitor = (reader) => {
   const destroy = new Subject();
   return interval(1).pipe(
@@ -68,10 +79,18 @@ const monitor = (reader) => {
   );
 };
 
-const disconnect = async (port, reader, readableStreamClosed) => {
+const disconnect = async (
+  port,
+  reader,
+  readableStreamClosed,
+  writer,
+  writableStreamClosed
+) => {
   reader.cancel();
   await readableStreamClosed.catch(() => {
     /* Ignore the error */
   });
+  writer.close();
+  await writableStreamClosed;
   await port.close();
 };
