@@ -1,5 +1,6 @@
 const connectButton = document.getElementById("connect-action");
 const disconnectButton = document.getElementById("disconnect-action");
+const writeButton = document.getElementById("write-action");
 const portLogsElement = document.getElementById("port-logs");
 
 const init = async () => {
@@ -44,6 +45,14 @@ const init = async () => {
     );
     isConnected = false;
     portLogsElement.innerHTML = "";
+  });
+
+  writeButton.addEventListener("click", async () => {
+    if (!isConnected) {
+      return;
+    }
+
+    writer.write("world");
   });
 };
 
