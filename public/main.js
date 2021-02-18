@@ -9,7 +9,6 @@ const init = async () => {
     port = await connect();
 
     reader = getReader(port);
-    writer = getWriter(port);
 
     monitor(reader).subscribe({
       next: (message) => {
